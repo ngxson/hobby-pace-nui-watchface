@@ -13,6 +13,8 @@ import com.ngxson.pacewatchface.widget.MalvarezClock;
 import com.ngxson.pacewatchface.widget.NuiClock;
 import com.ngxson.pacewatchface.widget.Widget;
 
+import java.util.List;
+
 /**
  * Splt version of the watch.
  */
@@ -35,9 +37,12 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     @Override
     protected SlptLayout createClockLayout26WC() {
         SlptAbsoluteLayout result = new SlptAbsoluteLayout();
-        for (SlptViewComponent component : clock.buildSlptViewComponent(this)) {
+
+        List<SlptViewComponent> list = ((NuiClock) clock).buildSlptViewComponent(this, true);
+        for (SlptViewComponent component : list) {
             result.add(component);
         }
+
         for (Widget widget : widgets) {
             for (SlptViewComponent component : widget.buildSlptViewComponent(this)) {
                 result.add(component);
@@ -50,9 +55,11 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     @Override
     protected SlptLayout createClockLayout8C() {
         SlptAbsoluteLayout result = new SlptAbsoluteLayout();
+
         for (SlptViewComponent component : clock.buildSlptViewComponent(this)) {
             result.add(component);
         }
+
         for (Widget widget : widgets) {
             for (SlptViewComponent component : widget.buildSlptViewComponent(this)) {
                 result.add(component);

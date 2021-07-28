@@ -79,12 +79,11 @@ public class NuiClock extends AnalogClockWidget {
         canvas.restore();
     }
 
-    @Override
-    public List<SlptViewComponent> buildSlptViewComponent(Service service) {
+    public List<SlptViewComponent> buildSlptViewComponent(Service service, boolean isHighRes) {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
 
         SlptPictureView background = new SlptPictureView();
-        background.setImagePicture(Util.assetToBytes(service, "nui_bg_8c.png"));
+        background.setImagePicture(Util.assetToBytes(service, isHighRes ? "nui_bg.png" : "nui_bg_8c.png"));
         slpt_objects.add(background);
 
         Typeface timeTypeFace = ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.ROBOTO);
@@ -96,26 +95,31 @@ public class NuiClock extends AnalogClockWidget {
         slpt_objects.add(dayLayout);
 
         SlptAnalogHourView slptAnalogHourView = new SlptAnalogHourView();
-        slptAnalogHourView.setImagePicture(SimpleFile.readFileFromAssets(service, "nui_hr_8c.png"));
+        slptAnalogHourView.setImagePicture(SimpleFile.readFileFromAssets(service, isHighRes ? "nui_hr.png" : "nui_hr_8c.png"));
         slptAnalogHourView.alignX = (byte) 2;
         slptAnalogHourView.alignY = (byte) 2;
         slptAnalogHourView.setRect(320, 320);
         slpt_objects.add(slptAnalogHourView);
 
         SlptAnalogMinuteView slptAnalogMinuteView = new SlptAnalogMinuteView();
-        slptAnalogMinuteView.setImagePicture(SimpleFile.readFileFromAssets(service, "nui_mn_8c.png"));
+        slptAnalogMinuteView.setImagePicture(SimpleFile.readFileFromAssets(service, isHighRes ? "nui_mn.png" : "nui_mn_8c.png"));
         slptAnalogMinuteView.alignX = (byte) 2;
         slptAnalogMinuteView.alignY = (byte) 2;
         slptAnalogMinuteView.setRect(320, 320);
         slpt_objects.add(slptAnalogMinuteView);
 
         SlptAnalogSecondView slptAnalogSecondView = new SlptAnalogSecondView();
-        slptAnalogSecondView.setImagePicture(SimpleFile.readFileFromAssets(service, "nui_sec_8c.png"));
+        slptAnalogSecondView.setImagePicture(SimpleFile.readFileFromAssets(service, isHighRes ? "nui_sec.png" : "nui_sec_8c.png"));
         slptAnalogSecondView.alignX = (byte) 2;
         slptAnalogSecondView.alignY = (byte) 2;
         slptAnalogSecondView.setRect(320, 320);
         slpt_objects.add(slptAnalogSecondView);
 
         return slpt_objects;
+    }
+
+    @Override
+    public List<SlptViewComponent> buildSlptViewComponent(Service service) {
+        return buildSlptViewComponent(service, false);
     }
 }
