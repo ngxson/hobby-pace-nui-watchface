@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.ingenic.iwds.slpt.view.core.SlptAbsoluteLayout;
 import com.ingenic.iwds.slpt.view.core.SlptLayout;
 import com.ingenic.iwds.slpt.view.core.SlptViewComponent;
+import com.ngxson.pacewatchface.widget.BackgroundLayer;
 import com.ngxson.pacewatchface.widget.NuiClock;
 import com.ngxson.pacewatchface.widget.Widget;
 
@@ -30,6 +31,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     public int onStartCommand(Intent intent, int flags, int startId) {
         context = this.getApplicationContext();
         this.clock = new NuiClock(this);
+        this.widgets.add(new BackgroundLayer(this));
 
         mIntent = intent;
         mFlags = flags;
@@ -47,14 +49,14 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     protected SlptLayout createClockLayout8C() {
         SlptAbsoluteLayout result = new SlptAbsoluteLayout();
 
-        for (SlptViewComponent component : clock.buildSlptViewComponent(this)) {
-            result.add(component);
-        }
-
         for (Widget widget : widgets) {
             for (SlptViewComponent component : widget.buildSlptViewComponent(this)) {
                 result.add(component);
             }
+        }
+
+        for (SlptViewComponent component : clock.buildSlptViewComponent(this)) {
+            result.add(component);
         }
 
         return result;

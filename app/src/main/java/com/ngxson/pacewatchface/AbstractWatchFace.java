@@ -40,12 +40,12 @@ public abstract class AbstractWatchFace extends com.huami.watch.watchface.Abstra
 
         @Override
         protected void onDrawDigital(Canvas canvas, float width, float height, float centerX, float centerY, int seconds, int minutes, int hours, int year, int month, int day, int week, int ampm) {
-            widget.onDrawDigital(canvas, width, height, centerX, centerY, seconds, minutes, hours, year, month, day, week, ampm);
             for (Widget widget : AbstractWatchFace.this.widgets) {
                 canvas.translate(widget.getX(), widget.getY());
                 widget.draw(canvas, width, height, centerX, centerY);
                 canvas.translate(-widget.getX(), -widget.getY());
             }
+            widget.onDrawDigital(canvas, width, height, centerX, centerY, seconds, minutes, hours, year, month, day, week, ampm);
         }
     }
 
@@ -70,12 +70,12 @@ public abstract class AbstractWatchFace extends com.huami.watch.watchface.Abstra
 
         @Override
         protected void onDrawAnalog(Canvas canvas, float width, float height, float centerX, float centerY, float secRot, float minRot, float hrRot) {
-            widget.onDrawAnalog(canvas, width, height, centerX, centerY, secRot, minRot, hrRot);
             for (Widget widget : AbstractWatchFace.this.widgets) {
                 canvas.translate(widget.getX(), widget.getY());
                 widget.draw(canvas, width, height, centerX, centerY);
                 canvas.translate(-widget.getX(), -widget.getY());
             }
+            widget.onDrawAnalog(canvas, width, height, centerX, centerY, secRot, minRot, hrRot);
         }
     }
 

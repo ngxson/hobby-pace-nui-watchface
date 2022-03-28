@@ -40,7 +40,7 @@ public class ResourceManager {
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
         int lunarDay = LunarCoreHelper.convertSolar2Lunar(day, month, year, 2)[0];
-        int imgNum = lunarDay >= 30 ? 1 : (lunarDay + 1);
+        int imgNum = lunarDay > 30 ? 1 : lunarDay;
         return (slpt ? "nui_bg_8c/nui_bg_" : "nui_bg/nui_bg_") + imgNum + ".png";
     }
 

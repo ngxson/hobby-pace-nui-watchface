@@ -2,6 +2,7 @@ package com.ngxson.pacewatchface;
 
 import com.huami.watch.watchface.AbstractSlptClock;
 
+import com.ngxson.pacewatchface.widget.BackgroundLayer;
 import com.ngxson.pacewatchface.widget.NuiClock;
 
 /**
@@ -12,7 +13,8 @@ public class PaceWatchFace extends AbstractWatchFace {
 
     public PaceWatchFace() {
         super(
-                new NuiClock(null)
+                new NuiClock(null),
+                new BackgroundLayer(null)
         );
     }
 
