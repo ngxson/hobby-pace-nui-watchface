@@ -33,7 +33,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
         context = this.getApplicationContext();
         this.clock = new NuiClock(this);
         this.widgets.add(new BackgroundLayer(this, true));
-        //this.widgets.add(new IndicatorLayer(this));
+        this.widgets.add(new IndicatorLayer(this, true));
 
         mIntent = intent;
         mFlags = flags;

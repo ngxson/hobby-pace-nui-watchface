@@ -8,6 +8,7 @@ import android.graphics.Paint;
 
 import com.ingenic.iwds.slpt.view.core.SlptPictureView;
 import com.ingenic.iwds.slpt.view.core.SlptViewComponent;
+import com.ngxson.pacewatchface.resource.IndicatorResource;
 import com.ngxson.pacewatchface.resource.ResourceManager;
 
 import java.util.ArrayList;
@@ -16,11 +17,16 @@ import java.util.List;
 public class IndicatorLayer extends AbstractWidget {
     private Service service;
     private Paint mGPaint;
+    private boolean isSplt;
+    private boolean ready = false;
 
-    public IndicatorLayer(Context ctx) {
+    public IndicatorLayer(Context ctx, boolean isSplt) {
         super();
+        this.isSplt = isSplt;
         if (ctx != null) {
             ResourceManager.preloadMinuteIndicator(ctx);
+            IndicatorResource.preload(ctx, isSplt);
+            this.ready = true;
         }
     }
 
@@ -28,27 +34,35 @@ public class IndicatorLayer extends AbstractWidget {
     public void init(Service service) {
         this.service = service;
         this.mGPaint = new Paint();
+        IndicatorResource.preload(service, isSplt);
+        this.ready = true;
     }
 
     @Override
     public List<SlptViewComponent> buildSlptViewComponent(Service service) {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
+        int minute = 5;
+        int [] coord = IndicatorResource.getXY(minute);
+        int x = coord[0];
+        int y = coord[1];
 
-        SlptPictureView background = new SlptPictureView();
-        background.setImagePicture(ResourceManager.minuteIndicator8c.get(5));
-        slpt_objects.add(background);
+        SlptPictureView indicatorImg = new SlptPictureView();
+        indicatorImg.setImagePicture(IndicatorResource.getImage8c(minute));
+        indicatorImg.setStart(x, y);
+        slpt_objects.add(indicatorImg);
 
         return slpt_objects;
     }
 
     @Override
     public void draw(Canvas canvas, float width, float height, float centerX, float centerY) {
-        Bitmap bm = ResourceManager.baseBitmapMinInd;
-        int min = 5;
+        if (!ready) return;
 
-        canvas.save();
-        canvas.rotate(min * 6, centerX, centerY);
-        canvas.drawBitmap(bm, centerX - bm.getWidth() / 2f, centerY - bm.getHeight() / 2f, null);
-        canvas.restore();
+        int minute = 5;
+        int [] coord = IndicatorResource.getXY(minute);
+        int x = coord[0];
+        int y = coord[1];
+
+        canvas.drawBitmap(IndicatorResource.getImage(minute), x, y, mGPaint);
     }
 }

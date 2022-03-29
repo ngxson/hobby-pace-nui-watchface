@@ -88,7 +88,7 @@ public class ResourceManager {
     }
 
     public static void preloadMinuteIndicator(Context ctx) {
-        if (!minuteIndicator.isEmpty()) return;
+        /*if (!minuteIndicator.isEmpty()) return;
         Bitmap baseBitmap = assetToBitmap(ctx, "nui_widget/minute_indicator.png");
         baseBitmapMinInd = baseBitmap;
         for (int i = 0; i < 60; i++) {
@@ -103,6 +103,6 @@ public class ResourceManager {
             byte[] bytes = com.huami.watch.watchface.util.Util.Bitmap2Bytes(tmp);
             minuteIndicator8c.add(bytes);
             Log.d("preloadMinuteIndicator", "i=" + i);
-        }
+        }*/
     }
 }
