@@ -23,8 +23,10 @@ public class IndicatorLayer extends AbstractWidget {
     private Paint mGPaint;
     private boolean isSplt;
     private boolean ready = false;
-    static ArrayList<CalendarResource.EventIndicator> indicators = new ArrayList<>();
-    static PaceWatchFaceSplt mainService;
+    public static PaceWatchFaceSplt mainService;
+
+    private final static long ONE_HR = 1*60*60000L + 10000;
+    private final static long TWO_HRS = 2*60*60000L + 10000;
 
     private long lastUpdate = 0;
 
@@ -48,16 +50,21 @@ public class IndicatorLayer extends AbstractWidget {
 
     @Override
     public List<SlptViewComponent> buildSlptViewComponent(Service service) {
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        ArrayList<CalendarResource.EventIndicator> indicators = CalendarResource.getIndicators(service);
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
         int x;
         int y;
 
         for (CalendarResource.EventIndicator indicator : indicators) {
+            long distance = Math.abs(indicator.milisec - currentTime);
+            if (distance > TWO_HRS) continue;
+            int prio = (distance <= ONE_HR) ? 0 : 1;
             int[] coord = IndicatorResource.getXY(indicator.minute);
             x = coord[0];
             y = coord[1];
             SlptPictureView indicatorImg = new SlptPictureView();
-            indicatorImg.setImagePicture(IndicatorResource.getImage8c(indicator.minute, indicator.priority));
+            indicatorImg.setImagePicture(IndicatorResource.getImage8c(indicator.minute, prio));
             indicatorImg.setStart(x, y);
             slpt_objects.add(indicatorImg);
         }
@@ -68,26 +75,19 @@ public class IndicatorLayer extends AbstractWidget {
     @Override
     public void draw(Canvas canvas, float width, float height, float centerX, float centerY) {
         if (!ready) return;
-        updateIndicators();
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        ArrayList<CalendarResource.EventIndicator> indicators = CalendarResource.getIndicators(service);
         int x;
         int y;
 
         for (CalendarResource.EventIndicator indicator : indicators) {
+            long distance = Math.abs(indicator.milisec - currentTime);
+            if (distance > TWO_HRS) continue;
+            int prio = (distance <= ONE_HR) ? 0 : 1;
             int[] coord = IndicatorResource.getXY(indicator.minute);
             x = coord[0];
             y = coord[1];
-            canvas.drawBitmap(IndicatorResource.getImage(indicator.minute, indicator.priority), x, y, mGPaint);
-        }
-    }
-
-    private void updateIndicators() {
-        if (mainService == null) return;
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-        if (currentTime - lastUpdate > (60*60000)) {
-            lastUpdate = currentTime;
-            indicators = CalendarResource.getIndicators(mainService);
-            Log.d("IndicatorLayer", "Got " + indicators.size() + " events");
-            mainService.updateSlptClock();
+            canvas.drawBitmap(IndicatorResource.getImage(indicator.minute, prio), x, y, mGPaint);
         }
     }
 }

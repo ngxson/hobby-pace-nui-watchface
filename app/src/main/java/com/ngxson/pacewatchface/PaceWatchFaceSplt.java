@@ -24,6 +24,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     int mFlags;
     int mStartId;
     boolean ready = false;
+    public static PaceWatchFaceSplt instance;
 
     public void updateSlptClock() {
         super.onStartCommand(mIntent, mFlags, mStartId);
@@ -31,6 +32,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        instance = this;
         context = this.getApplicationContext();
 
         if (!ready) {
