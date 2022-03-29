@@ -7,6 +7,7 @@ import com.ingenic.iwds.slpt.view.core.SlptAbsoluteLayout;
 import com.ingenic.iwds.slpt.view.core.SlptLayout;
 import com.ingenic.iwds.slpt.view.core.SlptViewComponent;
 import com.ngxson.pacewatchface.widget.BackgroundLayer;
+import com.ngxson.pacewatchface.widget.IndicatorLayer;
 import com.ngxson.pacewatchface.widget.NuiClock;
 import com.ngxson.pacewatchface.widget.Widget;
 
@@ -32,6 +33,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
         context = this.getApplicationContext();
         this.clock = new NuiClock(this);
         this.widgets.add(new BackgroundLayer(this));
+        //this.widgets.add(new IndicatorLayer(this));
 
         mIntent = intent;
         mFlags = flags;
