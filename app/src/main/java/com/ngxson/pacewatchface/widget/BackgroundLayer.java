@@ -31,20 +31,24 @@ public class BackgroundLayer extends AbstractWidget {
 
     private TextPaint dateFont;
     private Bitmap background;
+    private byte[] backgroundSlpt;
     private Paint mGPaint;
     private Calendar calendar;
     private int lastDay = -1;
     public static PaceWatchFaceSplt mainService;
+    private boolean isSlpt;
 
-    public BackgroundLayer(PaceWatchFaceSplt mainService) {
+    public BackgroundLayer(PaceWatchFaceSplt mainService, boolean isSlpt) {
         super();
         if (mainService != null) NuiClock.mainService = mainService;
+        this.isSlpt = isSlpt;
+        updateBackground(mainService, -1);
     }
 
     @Override
     public void init(Service service) {
-        this.background = Util.decodeImage(service.getResources(), ResourceManager.getBackgroundToday(false));
         this.mGPaint = new Paint();
+        updateBackground(service, -1);
 
         this.dateFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         this.dateFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.ROBOTO));
@@ -53,15 +57,25 @@ public class BackgroundLayer extends AbstractWidget {
         this.dateFont.setTextAlign(Paint.Align.LEFT);
     }
 
-    private void updateBackground(int d) {
+    private void updateBackground(Service s, int d) {
         int day = d;
-        if (mainService == null) return;
+        if (s == null) return;
         if (day == -1) {
             calendar = Calendar.getInstance();
             day = calendar.get(Calendar.DAY_OF_MONTH);
         }
         if (day != lastDay) {
-            this.background = Util.decodeImage(mainService.getResources(),ResourceManager.getBackgroundToday(false));
+            if (isSlpt) {
+                this.backgroundSlpt = Util.assetToBytes(
+                        s,
+                        ResourceManager.getBackgroundToday(true)
+                );
+            } else {
+                this.background = Util.decodeImage(
+                        s.getResources(),
+                        ResourceManager.getBackgroundToday(false)
+                );
+            }
             lastDay = day;
         }
     }
@@ -78,7 +92,7 @@ public class BackgroundLayer extends AbstractWidget {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
 
         SlptPictureView background = new SlptPictureView();
-        background.setImagePicture(Util.assetToBytes(service, ResourceManager.getBackgroundToday(true)));
+        background.setImagePicture(this.backgroundSlpt);
         slpt_objects.add(background);
 
         Typeface timeTypeFace = ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.ROBOTO);
@@ -97,7 +111,7 @@ public class BackgroundLayer extends AbstractWidget {
 
     @Override
     public void onDataUpdate(DataType type, Object value) {
-        updateBackground(-1);
+        updateBackground(mainService, -1);
     }
 
     @Override
@@ -105,7 +119,7 @@ public class BackgroundLayer extends AbstractWidget {
         calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        updateBackground(day);
+        updateBackground(mainService, day);
         canvas.drawBitmap(background, 0f, 0f, mGPaint);
 
         canvas.drawText(

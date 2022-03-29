@@ -15,7 +15,7 @@ public class PaceWatchFace extends AbstractWatchFace {
     public PaceWatchFace() {
         super(
                 new NuiClock(null),
-                new BackgroundLayer(null)
+                new BackgroundLayer(null, false)
                 //new IndicatorLayer(null)
         );
     }
