@@ -23,6 +23,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     Intent mIntent;
     int mFlags;
     int mStartId;
+    boolean ready = false;
 
     public void updateSlptClock() {
         super.onStartCommand(mIntent, mFlags, mStartId);
@@ -31,13 +32,18 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         context = this.getApplicationContext();
-        this.clock = new NuiClock(this);
-        this.widgets.add(new BackgroundLayer(this, true));
-        this.widgets.add(new IndicatorLayer(this, true));
 
-        mIntent = intent;
-        mFlags = flags;
-        mStartId = startId;
+        if (!ready) {
+            this.clock = new NuiClock(this);
+            this.widgets.add(new BackgroundLayer(this, true));
+            this.widgets.add(new IndicatorLayer(this, true));
+
+            mIntent = intent;
+            mFlags = flags;
+            mStartId = startId;
+
+            ready = true;
+        }
 
         return super.onStartCommand(intent, flags, startId);
     }

@@ -9,8 +9,11 @@ import com.huami.watch.watchface.util.Util;
 import java.util.ArrayList;
 
 public class IndicatorResource {
-    static ArrayList<Bitmap> img = new ArrayList<>();
-    static ArrayList<byte[]> img8c = new ArrayList<>();
+    static ArrayList<Bitmap> imgP0 = new ArrayList<>();
+    static ArrayList<byte[]> imgP08c = new ArrayList<>();
+    static ArrayList<Bitmap> imgP1 = new ArrayList<>();
+    static ArrayList<byte[]> imgP18c = new ArrayList<>();
+
     static final int[][] POSITION = {
             { 134, -12 },
             { 149, -12 },
@@ -74,42 +77,64 @@ public class IndicatorResource {
             { 118, -12 }
     };
 
-    public static Bitmap getImage(int minute) {
-        return img.get(minute);
+    public static Bitmap getImage(int minute, int priority) {
+        return priority == 0 ? imgP0.get(minute) : imgP1.get(minute);
     }
 
-    public static byte[] getImage8c(int minute) {
-        return img8c.get(minute);
+    public static byte[] getImage8c(int minute, int priority) {
+        return priority == 0 ? imgP08c.get(minute) : imgP18c.get(minute);
     }
 
     public static int[] getXY(int minute) {
         return POSITION[minute];
     }
 
+    static boolean loadingImg = false;
     static boolean readyImg = false;
     static boolean readyImg8c = false;
 
     public static void preload(Context ctx, boolean isSlpt) {
         try {
-            if (isSlpt && !readyImg) {
-                readyImg = true;
+            if (isSlpt && !loadingImg) {
+                loadingImg = true;
                 Bitmap bmp = ResourceManager.assetToBitmap(ctx, "indicator_sprite_set.png");
                 int w = bmp.getHeight();
                 for (int i = 0; i < 60; i++) {
                     Bitmap mBmp = Bitmap.createBitmap(bmp, i*w, 0, w, w);
-                    img.add(mBmp);
-                    Log.d("IndicatorResource", "Non-slpt " + i);
+                    imgP0.add(mBmp);
+                    Log.d("IndicatorResource", "Non-slpt P0 " + i);
                 }
+                bmp = ResourceManager.assetToBitmap(ctx, "indicator_2_sprite_set.png");
+                for (int i = 0; i < 60; i++) {
+                    Bitmap mBmp = Bitmap.createBitmap(bmp, i*w, 0, w, w);
+                    imgP1.add(mBmp);
+                    Log.d("IndicatorResource", "Non-slpt P1 " + i);
+                }
+                readyImg = true;
             }
 
             if (!isSlpt && !readyImg8c) {
                 readyImg8c = true;
-                Bitmap bmp = ResourceManager.assetToBitmap(ctx, "indicator_sprite_set.png");
-                int w = bmp.getHeight();
+                Bitmap bmp = readyImg
+                        ? null
+                        : ResourceManager.assetToBitmap(ctx, "indicator_sprite_set.png");
+                int w = readyImg ? imgP0.get(0).getHeight() : bmp.getHeight();
                 for (int i = 0; i < 60; i++) {
-                    Bitmap mBmp = Bitmap.createBitmap(bmp, i*w, 0, w, w);
-                    img8c.add(Util.Bitmap2Bytes(mBmp));
-                    Log.d("IndicatorResource", "Slpt " + i);
+                    Bitmap mBmp = readyImg
+                            ? imgP0.get(i)
+                            : Bitmap.createBitmap(bmp, i*w, 0, w, w);
+                    imgP08c.add(Util.Bitmap2Bytes(mBmp));
+                    Log.d("IndicatorResource", "Slpt P0 " + i);
+                }
+                bmp = readyImg
+                        ? null
+                        : ResourceManager.assetToBitmap(ctx, "indicator_2_sprite_set.png");
+                for (int i = 0; i < 60; i++) {
+                    Bitmap mBmp = readyImg
+                            ? imgP1.get(i)
+                            : Bitmap.createBitmap(bmp, i*w, 0, w, w);
+                    imgP18c.add(Util.Bitmap2Bytes(mBmp));
+                    Log.d("IndicatorResource", "Slpt P1 " + i);
                 }
             }
         } catch (Exception e) {
