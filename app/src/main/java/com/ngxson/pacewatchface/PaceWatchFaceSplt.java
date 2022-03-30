@@ -13,6 +13,8 @@ import com.ngxson.pacewatchface.widget.IndicatorLayer;
 import com.ngxson.pacewatchface.widget.NuiClock;
 import com.ngxson.pacewatchface.widget.Widget;
 
+import java.util.Calendar;
+
 /**
  * Splt version of the watch.
  */
@@ -26,9 +28,11 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     int mFlags;
     int mStartId;
     boolean ready = false;
+    boolean showSecond = true;
     public static PaceWatchFaceSplt instance;
 
     public void updateSlptClock() {
+        updateShowSecond();
         super.onStartCommand(mIntent, mFlags, mStartId);
         Log.d("PaceWatchFaceSplt", "updateSlptClock");
     }
@@ -48,6 +52,8 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
             mStartId = startId;
 
             CalendarResource.setupDataListender(this);
+            NuiAlarm.registerSecondHandUpdate(this);
+            updateShowSecond();
             ready = true;
         }
 
@@ -80,8 +86,14 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
         //Log.w("DinoDevs-GreatFit", "Initiating watchface");
     }
 
+    public void updateShowSecond() {
+        Calendar cal = Calendar.getInstance();
+        int hour24hrs = cal.get(Calendar.HOUR_OF_DAY);
+        showSecond = (hour24hrs > NuiAlarm.SHOW_SEC_HAND_FROM_HR);
+    }
+
     @Override
     public boolean isClockPeriodSecond() {
-        return true;
+        return showSecond;
     }
 }

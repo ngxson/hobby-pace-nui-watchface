@@ -20,6 +20,7 @@ public class CalendarResource {
     private final static String SETTING_NAME = "CustomCalendarData";
     private final static int CALENDAR_DATA_INDEX_START = 2;
     private final static int MAX_NB_EVENTS = 2;
+    private final static long ONE_HR = 60*60000L;
     private final static long TWO_HRS = 2*60*60000L;
 
     static ArrayList<Long> getNextEvents(Context ctx) {
@@ -95,6 +96,9 @@ public class CalendarResource {
         for (EventIndicator indicator : indicators) {
             long time;
             time = indicator.milisec;
+            if (currentTime < time && time < alarmTime)
+                alarmTime = time;
+            time = indicator.milisec - ONE_HR;
             if (currentTime < time && time < alarmTime)
                 alarmTime = time;
             time = indicator.milisec - TWO_HRS;
