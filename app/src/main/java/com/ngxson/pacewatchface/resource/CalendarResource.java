@@ -1,6 +1,10 @@
 package com.ngxson.pacewatchface.resource;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
+import android.net.Uri;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -13,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class CalendarResource {
+    private final static String SETTING_NAME = "CustomCalendarData";
     private final static int CALENDAR_DATA_INDEX_START = 2;
     private final static int MAX_NB_EVENTS = 2;
     private final static long TWO_HRS = 2*60*60000L;
@@ -21,7 +26,7 @@ public class CalendarResource {
         Calendar calendar = java.util.Calendar.getInstance();
         ArrayList<Long> result = new ArrayList<>();
         long currentTime = calendar.getTimeInMillis();
-        String calendarEvents = Settings.System.getString(ctx.getContentResolver(), "CustomCalendarData");
+        String calendarEvents = Settings.System.getString(ctx.getContentResolver(), SETTING_NAME);
         try {
             JSONObject json_data = new JSONObject(calendarEvents);
             if (json_data.has("events")) {
@@ -78,24 +83,44 @@ public class CalendarResource {
         // in case no event is found
         if (indicators.size() == 0) {
             long currentTime = Calendar.getInstance().getTimeInMillis();
-            nextUpdateTime = currentTime + TWO_HRS;
+            nextUpdateTime = currentTime + 24*TWO_HRS;
         }
     }
 
     public static long getNextAlarm(Context ctx) {
         ArrayList<EventIndicator> indicators = getIndicators(ctx);
         long currentTime = Calendar.getInstance().getTimeInMillis();
-        if (indicators.size() == 0)
-            return currentTime + TWO_HRS;
-        EventIndicator indicator = indicators.get(0);
-        if (currentTime < indicator.milisec - TWO_HRS)
-            return indicator.milisec - TWO_HRS;
-        else if (currentTime < indicator.milisec)
-            return indicator.milisec;
-        else if (indicators.size() > 1)
-            return indicators.get(1).milisec - TWO_HRS;
-        else
-            return currentTime + TWO_HRS;
+        long alarmTime = Long.MAX_VALUE;
+
+        for (EventIndicator indicator : indicators) {
+            long time;
+            time = indicator.milisec;
+            if (currentTime < time && time < alarmTime)
+                alarmTime = time;
+            time = indicator.milisec - TWO_HRS;
+            if (currentTime < time && time < alarmTime)
+                alarmTime = time;
+        }
+
+        return (alarmTime != Long.MAX_VALUE)
+                ? alarmTime
+                : (currentTime + 24*TWO_HRS);
+    }
+
+    public static void setupDataListender(final Context ctx) {
+        ContentResolver contentResolver = ctx.getContentResolver();
+        Uri setting = Settings.System.getUriFor(SETTING_NAME);
+
+        ContentObserver observer = new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                nextUpdateTime = -1;
+                getIndicators(ctx);
+            }
+        };
+
+        contentResolver.registerContentObserver(setting, false, observer);
     }
 
     public static class EventIndicator {

@@ -25,10 +25,8 @@ public class IndicatorLayer extends AbstractWidget {
     private boolean ready = false;
     public static PaceWatchFaceSplt mainService;
 
-    private final static long ONE_HR = 1*60*60000L + 10000;
-    private final static long TWO_HRS = 2*60*60000L + 10000;
-
-    private long lastUpdate = 0;
+    private final static long ONE_HR = 1*60*60000L;
+    private final static long TWO_HRS = 2*60*60000L;
 
     public IndicatorLayer(PaceWatchFaceSplt service, boolean isSplt) {
         super();
@@ -55,18 +53,24 @@ public class IndicatorLayer extends AbstractWidget {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
         int x;
         int y;
+        int lastMinute = -1;
 
         for (CalendarResource.EventIndicator indicator : indicators) {
+            if (lastMinute == indicator.minute) continue;
+            lastMinute = indicator.minute;
+
             long distance = Math.abs(indicator.milisec - currentTime);
             if (distance > TWO_HRS) continue;
             int prio = (distance <= ONE_HR) ? 0 : 1;
+
             int[] coord = IndicatorResource.getXY(indicator.minute);
             x = coord[0];
             y = coord[1];
+
             SlptPictureView indicatorImg = new SlptPictureView();
             indicatorImg.setImagePicture(IndicatorResource.getImage8c(indicator.minute, prio));
             indicatorImg.setStart(x, y);
-            slpt_objects.add(indicatorImg);
+            slpt_objects.add(0, indicatorImg);
         }
 
         return slpt_objects;
@@ -77,17 +81,30 @@ public class IndicatorLayer extends AbstractWidget {
         if (!ready) return;
         long currentTime = Calendar.getInstance().getTimeInMillis();
         ArrayList<CalendarResource.EventIndicator> indicators = CalendarResource.getIndicators(service);
+        ArrayList<int[]> drawOrder = new ArrayList<>();
         int x;
         int y;
+        int lastMinute = -1;
 
         for (CalendarResource.EventIndicator indicator : indicators) {
+            if (lastMinute == indicator.minute) continue;
+            lastMinute = indicator.minute;
+
             long distance = Math.abs(indicator.milisec - currentTime);
             if (distance > TWO_HRS) continue;
             int prio = (distance <= ONE_HR) ? 0 : 1;
+
             int[] coord = IndicatorResource.getXY(indicator.minute);
             x = coord[0];
             y = coord[1];
-            canvas.drawBitmap(IndicatorResource.getImage(indicator.minute, prio), x, y, mGPaint);
+
+            int[] draw = { indicator.minute, prio, x, y };
+            drawOrder.add(0, draw);
+        }
+
+        // draw order is reversed
+        for (int[] d : drawOrder) {
+            canvas.drawBitmap(IndicatorResource.getImage(d[0], d[1]), d[2], d[3], mGPaint);
         }
     }
 }

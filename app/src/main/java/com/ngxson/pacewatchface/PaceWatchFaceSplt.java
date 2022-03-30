@@ -2,10 +2,12 @@ package com.ngxson.pacewatchface;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.ingenic.iwds.slpt.view.core.SlptAbsoluteLayout;
 import com.ingenic.iwds.slpt.view.core.SlptLayout;
 import com.ingenic.iwds.slpt.view.core.SlptViewComponent;
+import com.ngxson.pacewatchface.resource.CalendarResource;
 import com.ngxson.pacewatchface.widget.BackgroundLayer;
 import com.ngxson.pacewatchface.widget.IndicatorLayer;
 import com.ngxson.pacewatchface.widget.NuiClock;
@@ -28,14 +30,15 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
 
     public void updateSlptClock() {
         super.onStartCommand(mIntent, mFlags, mStartId);
+        Log.d("PaceWatchFaceSplt", "updateSlptClock");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        instance = this;
-        context = this.getApplicationContext();
-
         if (!ready) {
+            instance = this;
+            context = this.getApplicationContext();
+
             this.clock = new NuiClock(this);
             this.widgets.add(new BackgroundLayer(this, true));
             this.widgets.add(new IndicatorLayer(this, true));
@@ -44,6 +47,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
             mFlags = flags;
             mStartId = startId;
 
+            CalendarResource.setupDataListender(this);
             ready = true;
         }
 

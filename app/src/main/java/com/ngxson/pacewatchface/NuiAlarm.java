@@ -11,13 +11,15 @@ import android.util.Log;
 import com.ngxson.pacewatchface.resource.CalendarResource;
 
 public class NuiAlarm extends BroadcastReceiver {
-    private static final int NUI_ALARM_CODE = 1234;
+    private static final int NUI_ALARM_CODE = 1212;
     public static final String REQUEST_CODE = "code";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         int code = intent.getIntExtra(REQUEST_CODE, 0);
+        // Log.d("NuiAlarm", "onReceive code " + code);
         if (code != NUI_ALARM_CODE) return;
+        // Log.d("NuiAlarm", "Alarm code OK");
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NuiWatchFace:alarm");
@@ -40,9 +42,13 @@ public class NuiAlarm extends BroadcastReceiver {
         cancelAlarm(context, alarmManager);
         Intent i = new Intent(context, NuiAlarm.class);
         i.putExtra(REQUEST_CODE, NUI_ALARM_CODE);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, milis, pi);
-        Log.d("NuiAlarm", "setAlarm " + milis);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, NUI_ALARM_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (alarmManager != null) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, alarmIntent);
+            Log.d("NuiAlarm", "setAlarm " + milis);
+        } else {
+            Log.e("NuiAlarm", "setAlarm FAILED: alarmManager is null");
+        }
     }
 
     private static void cancelAlarm(Context context, AlarmManager alarmManager) {
