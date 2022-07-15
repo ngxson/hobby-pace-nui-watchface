@@ -33,6 +33,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
 
     public void updateSlptClock() {
         updateShowSecond();
+        NuiAlarm.registerSecondHandUpdate(this);
         super.onStartCommand(mIntent, mFlags, mStartId);
         Log.d("PaceWatchFaceSplt", "updateSlptClock");
     }
@@ -40,6 +41,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (!ready) {
+            Log.d("PaceWatchFaceSplt", "onStartCommand init");
             instance = this;
             context = this.getApplicationContext();
 
@@ -57,7 +59,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
             ready = true;
         }
 
-        return START_STICKY;
+        return super.onStartCommand(mIntent, mFlags, mStartId);
     }
 
     @Override
@@ -78,6 +80,8 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
         for (SlptViewComponent component : clock.buildSlptViewComponent(this)) {
             result.add(component);
         }
+
+        Log.d("PaceWatchFaceSplt", "createClockLayout8C result length = " + result.size());
 
         return result;
     }
