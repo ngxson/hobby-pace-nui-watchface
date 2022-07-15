@@ -34,10 +34,11 @@ public class NuiAlarm extends BroadcastReceiver {
             long nextAlarm = CalendarResource.getNextAlarm(context);
             setAlarm(context, nextAlarm);
 
-        } else {
+        } else if (code == NUI_ALARM_SEC_HAND_UPDATE) {
             // update second hand visibility
             if (PaceWatchFaceSplt.instance != null) {
                 PaceWatchFaceSplt.instance.updateSlptClock();
+                registerSecondHandUpdate(context);
             }
         }
 
@@ -74,32 +75,40 @@ public class NuiAlarm extends BroadcastReceiver {
         long now = cal.getTimeInMillis();
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.SECOND, 4);
         cal.set(Calendar.MILLISECOND, 0);
-        long beginOfToday = cal.getTimeInMillis();
-        long beginOfTomorrow = beginOfToday + 24*ONE_HR;
-        setAlarmRepeatedDaily(context, beginOfTomorrow);
-        if (now < beginOfToday + SHOW_SEC_HAND_FROM_HR * ONE_HR)
-            setAlarmRepeatedDaily(context, beginOfToday + SHOW_SEC_HAND_FROM_HR * ONE_HR);
-        else
-            setAlarmRepeatedDaily(context, beginOfTomorrow + SHOW_SEC_HAND_FROM_HR * ONE_HR);
+        long tBeginOfToday = cal.getTimeInMillis();
+        long tShowSecondHand = tBeginOfToday + SHOW_SEC_HAND_FROM_HR * ONE_HR;
+        long tBeginOfTomorrow = tBeginOfToday + 24*ONE_HR;
+        /**
+         * tBeginOfToday       now        tShowSecondHand    tBeginOfTomorrow
+         *     |----------------x----------------|------------------|
+         *
+         * tBeginOfToday  tShowSecondHand       now          tBeginOfTomorrow
+         *     |----------------|----------------x------------------|
+         */
+
+        if (now < tBeginOfToday) { // this case should never happen
+            setAlarmUpdateSecondHand(context, now + 10000L);
+        } else if (now > tBeginOfTomorrow) { // this case should never happen
+            setAlarmUpdateSecondHand(context, tBeginOfTomorrow + SHOW_SEC_HAND_FROM_HR * ONE_HR);
+        } else if (now < tShowSecondHand) {
+            setAlarmUpdateSecondHand(context, tShowSecondHand);
+        } else {
+            setAlarmUpdateSecondHand(context, tBeginOfTomorrow);
+        }
     }
 
-    private static void setAlarmRepeatedDaily(Context context, long milis) {
+    private static void setAlarmUpdateSecondHand(Context context, long milis) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, NuiAlarm.class);
         i.putExtra(REQUEST_CODE, NUI_ALARM_SEC_HAND_UPDATE);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, NUI_ALARM_SEC_HAND_UPDATE, i, PendingIntent.FLAG_UPDATE_CURRENT);
         if (alarmManager != null) {
-            alarmManager.setInexactRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    milis,
-                    AlarmManager.INTERVAL_DAY,
-                    alarmIntent
-            );
-            Log.d("NuiAlarm", "setAlarmRepeatedDaily " + milis);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, alarmIntent);
+            Log.d("NuiAlarm", "setAlarmUpdateSecondHand " + milis);
         } else {
-            Log.e("NuiAlarm", "setAlarmRepeatedDaily FAILED: alarmManager is null");
+            Log.e("NuiAlarm", "setAlarmUpdateSecondHand FAILED: alarmManager is null");
         }
     }
 }

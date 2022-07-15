@@ -57,7 +57,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
             ready = true;
         }
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
