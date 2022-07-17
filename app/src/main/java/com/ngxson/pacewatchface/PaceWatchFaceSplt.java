@@ -93,7 +93,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     public void updateShowSecond() {
         Calendar cal = Calendar.getInstance();
         int hour24hrs = cal.get(Calendar.HOUR_OF_DAY);
-        showSecond = (hour24hrs > NuiAlarm.SHOW_SEC_HAND_FROM_HR);
+        showSecond = (hour24hrs >= NuiAlarm.SHOW_SEC_HAND_FROM_HR);
     }
 
     @Override
