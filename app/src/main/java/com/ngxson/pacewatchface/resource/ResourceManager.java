@@ -24,6 +24,8 @@ public class ResourceManager {
     static Calendar calendar;
     public static ArrayList<byte[]> minuteIndicator = new ArrayList<>();
     public static ArrayList<byte[]> minuteIndicator8c = new ArrayList<>();
+    //public static ArrayList<Bitmap> bgCached = new ArrayList<>();
+    //public static ArrayList<byte[]> bgCached8c = new ArrayList<>();
     public static Bitmap baseBitmapMinInd;
 
     public enum Font {
@@ -52,7 +54,7 @@ public class ResourceManager {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
-        int lunarDay = LunarCoreHelper.convertSolar2Lunar(day, month, year, 2)[0];
+        int lunarDay = LunarCoreHelper.convertSolar2Lunar(day, month, year, 10)[0];
         int imgNum = lunarDay > 30 ? 1 : lunarDay;
         return (slpt ? "nui_bg_8c/nui_bg_" : "nui_bg/nui_bg_") + imgNum + ".png";
     }

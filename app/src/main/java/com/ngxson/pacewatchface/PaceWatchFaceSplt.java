@@ -31,10 +31,14 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     boolean showSecond = true;
     public static PaceWatchFaceSplt instance;
 
-    public void updateSlptClock() {
+    public void updateSlptClock(boolean isSecondHandUpdate) {
+        if (isSecondHandUpdate) {
+            BackgroundLayer.forcedUpdate = true;
+        }
         updateShowSecond();
         NuiAlarm.registerSecondHandUpdate(this);
         super.onStartCommand(mIntent, mFlags, mStartId);
+        BackgroundLayer.forcedUpdate = false;
         Log.d("PaceWatchFaceSplt", "updateSlptClock");
     }
 
@@ -91,9 +95,7 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     }
 
     public void updateShowSecond() {
-        Calendar cal = Calendar.getInstance();
-        int hour24hrs = cal.get(Calendar.HOUR_OF_DAY);
-        showSecond = (hour24hrs >= NuiAlarm.SHOW_SEC_HAND_FROM_HR);
+        showSecond = Utils.shouldShowSecondHand();
     }
 
     @Override

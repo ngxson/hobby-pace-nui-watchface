@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class BackgroundLayer extends AbstractWidget {
+    public static boolean forcedUpdate = false;
+
     private static final int DAY_OFFSET_X = 263 + 6;
     private static final int DAY_OFFSET_Y = 143 + 4;
     private static final int DAY_FONT_SIZE = 22;
@@ -60,7 +62,7 @@ public class BackgroundLayer extends AbstractWidget {
     private void updateBackground(Service s, int d) {
         int day = d;
         if (s == null) return;
-        if (day == -1) {
+        if (day == -1 || forcedUpdate) {
             calendar = Calendar.getInstance();
             day = calendar.get(Calendar.DAY_OF_MONTH);
         }
@@ -82,7 +84,9 @@ public class BackgroundLayer extends AbstractWidget {
 
     @Override
     public List<DataType> getDataTypes() {
-        return Collections.singletonList(DataType.DATE);
+        // TODO: maybe this part of code is conflicted with NUI_ALARM_SEC_HAND_UPDATE
+        //return Collections.singletonList(DataType.DATE);
+        return Collections.emptyList();
     }
 
     @Override
@@ -111,7 +115,7 @@ public class BackgroundLayer extends AbstractWidget {
 
     @Override
     public void onDataUpdate(DataType type, Object value) {
-        updateBackground(mainService, -1);
+        // updateBackground(mainService, -1);
     }
 
     @Override

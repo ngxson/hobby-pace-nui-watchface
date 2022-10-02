@@ -29,7 +29,7 @@ public class NuiAlarm extends BroadcastReceiver {
             // update calendar
             CalendarResource.getIndicators(context); // trigger update
             if (PaceWatchFaceSplt.instance != null) {
-                PaceWatchFaceSplt.instance.updateSlptClock();
+                PaceWatchFaceSplt.instance.updateSlptClock(false);
             }
             long nextAlarm = CalendarResource.getNextAlarm(context);
             setAlarm(context, nextAlarm);
@@ -37,7 +37,7 @@ public class NuiAlarm extends BroadcastReceiver {
         } else if (code == NUI_ALARM_SEC_HAND_UPDATE) {
             // update second hand visibility
             if (PaceWatchFaceSplt.instance != null) {
-                PaceWatchFaceSplt.instance.updateSlptClock();
+                PaceWatchFaceSplt.instance.updateSlptClock(true);
                 registerSecondHandUpdate(context);
             }
         }

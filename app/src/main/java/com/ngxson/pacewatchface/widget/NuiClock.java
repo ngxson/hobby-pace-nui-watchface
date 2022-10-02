@@ -20,6 +20,7 @@ import com.ingenic.iwds.slpt.view.utils.SimpleFile;
 import com.ngxson.pacewatchface.PaceWatchFace;
 import com.ngxson.pacewatchface.PaceWatchFaceSplt;
 import com.ngxson.pacewatchface.R;
+import com.ngxson.pacewatchface.Utils;
 import com.ngxson.pacewatchface.resource.ResourceManager;
 
 import java.util.ArrayList;
@@ -62,10 +63,12 @@ public class NuiClock extends AnalogClockWidget {
         canvas.drawBitmap(mnHand, centerX - mnHand.getWidth() / 2f, centerY - mnHand.getHeight() / 2f, null);
         canvas.restore();
 
-        canvas.save();
-        canvas.rotate(secRot, centerX, centerY);
-        canvas.drawBitmap(secHand, centerX - secHand.getWidth() / 2f, centerY - secHand.getHeight() / 2f, null);
-        canvas.restore();
+        if (Utils.shouldShowSecondHand(calendar)) {
+            canvas.save();
+            canvas.rotate(secRot, centerX, centerY);
+            canvas.drawBitmap(secHand, centerX - secHand.getWidth() / 2f, centerY - secHand.getHeight() / 2f, null);
+            canvas.restore();
+        }
     }
 
     public List<SlptViewComponent> buildSlptViewComponent(Service service, boolean isHighRes) {
@@ -85,12 +88,14 @@ public class NuiClock extends AnalogClockWidget {
         slptAnalogMinuteView.setRect(320, 320);
         slpt_objects.add(slptAnalogMinuteView);
 
-        SlptAnalogSecondView slptAnalogSecondView = new SlptAnalogSecondView();
-        slptAnalogSecondView.setImagePicture(SimpleFile.readFileFromAssets(service, isHighRes ? "nui_hands/sec.png" : "nui_hands_8c/sec.png"));
-        slptAnalogSecondView.alignX = (byte) 2;
-        slptAnalogSecondView.alignY = (byte) 2;
-        slptAnalogSecondView.setRect(320, 320);
-        slpt_objects.add(slptAnalogSecondView);
+        if (Utils.shouldShowSecondHand()) {
+            SlptAnalogSecondView slptAnalogSecondView = new SlptAnalogSecondView();
+            slptAnalogSecondView.setImagePicture(SimpleFile.readFileFromAssets(service, isHighRes ? "nui_hands/sec.png" : "nui_hands_8c/sec.png"));
+            slptAnalogSecondView.alignX = (byte) 2;
+            slptAnalogSecondView.alignY = (byte) 2;
+            slptAnalogSecondView.setRect(320, 320);
+            slpt_objects.add(slptAnalogSecondView);
+        }
 
         return slpt_objects;
     }
