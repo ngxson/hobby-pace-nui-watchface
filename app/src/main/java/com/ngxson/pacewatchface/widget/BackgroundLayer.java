@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;
+import android.util.Log;
 
 import com.huami.watch.watchface.util.Util;
 import com.ingenic.iwds.slpt.view.core.SlptLinearLayout;
@@ -22,10 +23,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class BackgroundLayer extends AbstractWidget {
-    public static boolean forcedUpdate = false;
-
     private static final int DAY_OFFSET_X = 263 + 6;
     private static final int DAY_OFFSET_Y = 143 + 4;
     private static final int DAY_FONT_SIZE = 22;
@@ -59,24 +59,25 @@ public class BackgroundLayer extends AbstractWidget {
         this.dateFont.setTextAlign(Paint.Align.LEFT);
     }
 
-    private void updateBackground(Service s, int d) {
+    /**
+     *
+     * @param s
+     * @param d if d == -2: force reload; if d < 0: get the current day
+     */
+    public void updateBackground(Service s, int d) {
         int day = d;
         if (s == null) return;
-        if (day == -1 || forcedUpdate) {
+        if (day < 0) {
             calendar = Calendar.getInstance();
             day = calendar.get(Calendar.DAY_OF_MONTH);
         }
-        if (day != lastDay) {
+        Log.d("Nui", "day != lastDay: " + (day != lastDay ? "1" : "0"));
+        if (day != lastDay || d == -2) {
+            int imgNum = ResourceManager.getBackgroundTodayImgNum();
             if (isSlpt) {
-                this.backgroundSlpt = Util.assetToBytes(
-                        s,
-                        ResourceManager.getBackgroundToday(true)
-                );
+                this.backgroundSlpt = ResourceManager.getBackground8c(s, imgNum);
             } else {
-                this.background = Util.decodeImage(
-                        s.getResources(),
-                        ResourceManager.getBackgroundToday(false)
-                );
+                this.background = ResourceManager.getBackground(s, imgNum);
             }
             lastDay = day;
         }

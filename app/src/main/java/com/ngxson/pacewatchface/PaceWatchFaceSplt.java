@@ -29,16 +29,15 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
     int mStartId;
     boolean ready = false;
     boolean showSecond = true;
+    BackgroundLayer backgroundLayer;
+    IndicatorLayer indicatorLayer;
     public static PaceWatchFaceSplt instance;
 
     public void updateSlptClock(boolean isSecondHandUpdate) {
-        if (isSecondHandUpdate) {
-            BackgroundLayer.forcedUpdate = true;
-        }
+        backgroundLayer.updateBackground(this, -2);
         updateShowSecond();
         NuiAlarm.registerSecondHandUpdate(this);
         super.onStartCommand(mIntent, mFlags, mStartId);
-        BackgroundLayer.forcedUpdate = false;
         Log.d("PaceWatchFaceSplt", "updateSlptClock");
     }
 
@@ -50,8 +49,10 @@ public class PaceWatchFaceSplt extends AbstractWatchFaceSlpt {
             context = this.getApplicationContext();
 
             this.clock = new NuiClock(this);
-            this.widgets.add(new BackgroundLayer(this, true));
-            this.widgets.add(new IndicatorLayer(this, true));
+            this.backgroundLayer = new BackgroundLayer(this, true);
+            this.indicatorLayer = new IndicatorLayer(this, true);
+            this.widgets.add(this.backgroundLayer);
+            this.widgets.add(this.indicatorLayer);
 
             mIntent = intent;
             mFlags = flags;

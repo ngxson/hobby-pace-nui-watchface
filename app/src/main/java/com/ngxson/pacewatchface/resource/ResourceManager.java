@@ -9,11 +9,15 @@ import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.util.Log;
 
+import com.huami.watch.watchface.util.Util;
+import com.ngxson.pacewatchface.Utils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -24,8 +28,8 @@ public class ResourceManager {
     static Calendar calendar;
     public static ArrayList<byte[]> minuteIndicator = new ArrayList<>();
     public static ArrayList<byte[]> minuteIndicator8c = new ArrayList<>();
-    //public static ArrayList<Bitmap> bgCached = new ArrayList<>();
-    //public static ArrayList<byte[]> bgCached8c = new ArrayList<>();
+    public static HashMap<String, Bitmap> bgCached = new HashMap<>();
+    public static HashMap<String, byte[]> bgCached8c = new HashMap<>();
     public static Bitmap baseBitmapMinInd;
 
     public enum Font {
@@ -49,14 +53,40 @@ public class ResourceManager {
         return typeface;
     }
 
-    public static String getBackgroundToday(boolean slpt) {
+    /**
+     * BACKGROUND
+     */
+
+    public static int getBackgroundTodayImgNum() {
         calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
         int lunarDay = LunarCoreHelper.convertSolar2Lunar(day, month, year, 10)[0];
         int imgNum = lunarDay > 30 ? 1 : lunarDay;
-        return (slpt ? "nui_bg_8c/nui_bg_" : "nui_bg/nui_bg_") + imgNum + ".png";
+        return imgNum;
+    }
+
+    public static byte[] getBackground8c(Context ctx, int imgNum) {
+        String file = "nui_bg_8c/nui_bg_" + imgNum + ".png";
+        if (!bgCached8c.containsKey(file)) {
+            byte[] data = Util.assetToBytes(ctx, file);
+            bgCached8c.put(file, data);
+            return data;
+        } else {
+            return bgCached8c.get(file);
+        }
+    }
+
+    public static Bitmap getBackground(Context ctx, int imgNum) {
+        String file = "nui_bg/nui_bg_" + imgNum + ".png";
+        if (!bgCached.containsKey(file)) {
+            Bitmap data = Util.decodeImage(ctx.getResources(), file);
+            bgCached.put(file, data);
+            return data;
+        } else {
+            return bgCached.get(file);
+        }
     }
 
     /**
