@@ -13,11 +13,14 @@ import com.ngxson.pacewatchface.widget.NuiClock;
 public class PaceWatchFace extends AbstractWatchFace {
 
     public PaceWatchFace() {
-        super(
-                new NuiClock(null),
-                new BackgroundLayer(null, false),
-                new IndicatorLayer(null, false)
-        );
+        super(new NuiClock(null));
+        // background
+        BackgroundLayer bg = new BackgroundLayer(null, false);
+        bg.setContext(this.getBaseContext());
+        this.widgets.add(bg);
+        // indicator
+        IndicatorLayer indicatorLayer = new IndicatorLayer(null, false);
+        this.widgets.add(indicatorLayer);
     }
 
     @Override

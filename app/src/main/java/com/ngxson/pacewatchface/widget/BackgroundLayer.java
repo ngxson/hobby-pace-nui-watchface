@@ -1,6 +1,7 @@
 package com.ngxson.pacewatchface.widget;
 
 import android.app.Service;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -39,12 +40,17 @@ public class BackgroundLayer extends AbstractWidget {
     private int lastDay = -1;
     public static PaceWatchFaceSplt mainService;
     private boolean isSlpt;
+    private Context ctx;
 
     public BackgroundLayer(PaceWatchFaceSplt mainService, boolean isSlpt) {
         super();
         if (mainService != null) NuiClock.mainService = mainService;
         this.isSlpt = isSlpt;
         updateBackground(mainService, -1);
+    }
+
+    public void setContext(Context c) {
+        ctx = c;
     }
 
     @Override
@@ -65,8 +71,13 @@ public class BackgroundLayer extends AbstractWidget {
      * @param d if d == -2: force reload; if d < 0: get the current day
      */
     public void updateBackground(Service s, int d) {
-        int day = d;
         if (s == null) return;
+        else updateBackground(s.getApplicationContext(), d);
+    }
+
+    public void updateBackground(Context c, int d) {
+        int day = d;
+        if (c == null) return;
         if (day < 0) {
             calendar = Calendar.getInstance();
             day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -75,9 +86,9 @@ public class BackgroundLayer extends AbstractWidget {
         if (day != lastDay || d == -2) {
             int imgNum = ResourceManager.getBackgroundTodayImgNum();
             if (isSlpt) {
-                this.backgroundSlpt = ResourceManager.getBackground8c(s, imgNum);
+                this.backgroundSlpt = ResourceManager.getBackground8c(c, imgNum);
             } else {
-                this.background = ResourceManager.getBackground(s, imgNum);
+                this.background = ResourceManager.getBackground(c, imgNum);
             }
             lastDay = day;
         }
@@ -124,7 +135,7 @@ public class BackgroundLayer extends AbstractWidget {
         calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        updateBackground(mainService, day);
+        updateBackground(ctx, day);
         canvas.drawBitmap(background, 0f, 0f, mGPaint);
 
         canvas.drawText(
